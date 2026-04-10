@@ -2,6 +2,12 @@
 
 A modern, beautiful weather application built with React Native and Expo.
 
+
+https://github.com/user-attachments/assets/fe61c28e-209b-4813-a595-139c66e56d4e
+
+
+
+
 ## Features
 
 ### 🌤 Core Functionality
