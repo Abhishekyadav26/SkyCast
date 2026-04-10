@@ -29,6 +29,18 @@ export const fetchWeatherByCity = async (city: string) => {
   return response.data;
 };
 
+// 5-day forecast by city name
+export const fetchForecastByCity = async (city: string) => {
+  const response = await axios.get(`${BASE_URL}/forecast`, {
+    params: {
+      q: city,
+      appid: API_KEY,
+      units: 'metric',
+    },
+  });
+  return response.data;
+};
+
 // 5-day / 3-hour forecast by coordinates
 export const fetchForecastByCoords = async (lat: number, lon: number) => {
   const response = await axios.get(`${BASE_URL}/forecast`, {

@@ -1,9 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchWeatherByCoords, fetchForecastByCoords, fetchWeatherByCity } from '../utils/api';
+import { 
+  fetchWeatherByCoords, 
+  fetchForecastByCoords, 
+  fetchWeatherByCity, 
+  fetchForecastByCity 
+} from '../utils/api';
 
 interface Coordinates {
   lat: number;
   lon: number;
+}
+
+interface LocationData {
+  lat?: number;
+  lon?: number;
+  city?: string;
 }
 
 interface Weather {
@@ -42,29 +53,34 @@ interface Forecast {
   }>;
 }
 
-export function useWeather(coords: Coordinates | null, city?: string) {
+export function useWeather(coords: Coordinates | null, selectedLocation?: LocationData | null) {
   const [weather, setWeather] = useState<Weather | null>(null);
   const [forecast, setForecast] = useState<Forecast | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const loadWeather = useCallback(async () => {
+    // Priority: selected city > selected coords > GPS coords
+    const source = selectedLocation || coords;
+    if (!source) return;
+
     setLoading(true);
     setError(null);
 
     try {
       let weatherData, forecastData;
 
-      if (city) {
-        // Search by city name
-        weatherData = await fetchWeatherByCity(city);
-        // For city search, we don't need forecast for now
-        forecastData = null;
-      } else if (coords) {
-        // Get weather by coordinates
+      if ('city' in source && source.city) {
+        // City name search
         [weatherData, forecastData] = await Promise.all([
-          fetchWeatherByCoords(coords.lat, coords.lon),
-          fetchForecastByCoords(coords.lat, coords.lon),
+          fetchWeatherByCity(source.city),
+          fetchForecastByCity(source.city),
+        ]);
+      } else if ('lat' in source && 'lon' in source && source.lat && source.lon) {
+        // Coordinates
+        [weatherData, forecastData] = await Promise.all([
+          fetchWeatherByCoords(source.lat, source.lon),
+          fetchForecastByCoords(source.lat, source.lon),
         ]);
       } else {
         return;
@@ -73,12 +89,16 @@ export function useWeather(coords: Coordinates | null, city?: string) {
       setWeather(weatherData);
       setForecast(forecastData);
     } catch (e: any) {
-      setError('Failed to load weather. Check your API key or connection.');
+      setError(
+        e.response?.status === 404
+          ? 'City not found. Check the spelling and try again.'
+          : 'Failed to load weather. Check your connection.'
+      );
       console.error(e.response?.data || e.message);
     } finally {
       setLoading(false);
     }
-  }, [coords, city]);
+  }, [coords, selectedLocation]);
 
   useEffect(() => {
     loadWeather();
