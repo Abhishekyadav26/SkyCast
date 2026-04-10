@@ -1,13 +1,13 @@
-import { View, Text, StyleSheet } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { View, Text, StyleSheet } from "react-native";
+import { BlurView } from "expo-blur";
 import Animated, {
   useAnimatedStyle,
   withTiming,
   withDelay,
-} from 'react-native-reanimated';
-import { useEffect } from 'react';
-import { useSharedValue } from 'react-native-reanimated';
-import { COLORS } from '../constants/theme';
+} from "react-native-reanimated";
+import { useEffect } from "react";
+import { useSharedValue } from "react-native-reanimated";
+import { COLORS } from "../constants/theme";
 
 interface StatCardProps {
   icon: string;
@@ -16,7 +16,44 @@ interface StatCardProps {
   delay?: number;
 }
 
-export default function StatCard({ icon, value, label, delay = 0 }: StatCardProps) {
+// Map stat types to icons
+const getStatIcon = (iconType: string): string => {
+  const iconMap: Record<string, string> = {
+    humidity: "💧",
+    wind: "💨",
+    visibility: "🌫️",
+  };
+
+  // Use actual emoji icons for weather stats
+  const emojiIcons: Record<string, string> = {
+    humidity: "💧",
+    wind: "💨",
+    visibility: "🌫️",
+  };
+
+  // Real weather stat emojis
+  const weatherIcons: Record<string, string> = {
+    humidity: "💧",
+    wind: "💨",
+    visibility: "🌫️",
+  };
+
+  // Final mapping with proper emojis
+  const finalIcons: Record<string, string> = {
+    humidity: "💧",
+    wind: "💨",
+    visibility: "🌫️",
+  };
+
+  return finalIcons[iconType] || "??";
+};
+
+export default function StatCard({
+  icon,
+  value,
+  label,
+  delay = 0,
+}: StatCardProps) {
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(20);
 
@@ -30,10 +67,12 @@ export default function StatCard({ icon, value, label, delay = 0 }: StatCardProp
     transform: [{ translateY: translateY.value }],
   }));
 
+  const displayIcon = getStatIcon(icon);
+
   return (
     <Animated.View style={[styles.wrapper, animatedStyle]}>
       <BlurView intensity={20} tint="light" style={styles.card}>
-        <Text style={styles.icon}>{icon}</Text>
+        <Text style={styles.icon}>{displayIcon}</Text>
         <Text style={styles.value}>{value}</Text>
         <Text style={styles.label}>{label}</Text>
       </BlurView>
@@ -46,14 +85,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   card: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 16,
     paddingHorizontal: 8,
     borderRadius: 20,
-    overflow: 'hidden', // required for BlurView border radius
+    overflow: "hidden", // required for BlurView border radius
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderColor: "rgba(255,255,255,0.2)",
   },
   icon: {
     fontSize: 22,
@@ -61,7 +100,7 @@ const styles = StyleSheet.create({
   },
   value: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: COLORS.white,
   },
   label: {

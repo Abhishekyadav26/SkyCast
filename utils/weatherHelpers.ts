@@ -51,3 +51,60 @@ export const formatDay = (timestamp: number): string =>
 
 export const formatDate = (timestamp: number): string =>
   dayjs.unix(timestamp).format('MMM D, YYYY');
+
+// Get first 8 forecast entries = next 24 hours (3hr intervals)
+export const getHourlyForecast = (forecastList: any[]) => {
+  return forecastList.slice(0, 8);
+};
+
+interface ForecastDay {
+  dt: number;
+  temps: number[];
+  weatherId: number;
+  description: string;
+}
+
+interface DailyForecastItem extends ForecastDay {
+  maxTemp: number;
+  minTemp: number;
+}
+
+// Group forecast by day and extract daily high/low
+export const getDailyForecast = (forecastList: any[]): DailyForecastItem[] => {
+  const grouped: Record<string, ForecastDay> = {};
+
+  forecastList.forEach(item => {
+    const day = dayjs.unix(item.dt).format('YYYY-MM-DD');
+
+    if (!grouped[day]) {
+      grouped[day] = {
+        dt: item.dt,
+        temps: [],
+        weatherId: item.weather[0].id,
+        description: item.weather[0].description,
+      };
+    }
+
+    grouped[day].temps.push(item.main.temp);
+
+    // Use midday entry for the icon (most representative)
+    const hour = dayjs.unix(item.dt).hour();
+    if (hour >= 12 && hour <= 15) {
+      grouped[day].weatherId = item.weather[0].id;
+    }
+  });
+
+  return Object.values(grouped)
+    .slice(0, 7) // max 7 days
+    .map(day => ({
+      ...day,
+      maxTemp: Math.round(Math.max(...day.temps)),
+      minTemp: Math.round(Math.min(...day.temps)),
+    }));
+};
+
+// Temperature range bar width (for the visual bar in daily forecast)
+export const getTempBarWidth = (temp: number, minTemp: number, maxTemp: number): number => {
+  if (maxTemp === minTemp) return 50;
+  return ((temp - minTemp) / (maxTemp - minTemp)) * 100;
+};

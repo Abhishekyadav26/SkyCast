@@ -28,6 +28,8 @@ import { GRADIENTS, COLORS, SIZES } from "../constants/theme";
 import WeatherIcon from "../components/WeatherIcon";
 import StatCard from "../components/StatCard";
 import WeatherBackground from "../components/WeatherBackground";
+import HourlyForecast from "../components/HourlyForecast";
+import DailyForecast from "../components/DailyForecast";
 
 const { width } = Dimensions.get("window");
 
@@ -36,6 +38,7 @@ export default function HomeScreen() {
   const { coords, loading: locationLoading } = useLocation();
   const {
     weather,
+    forecast,
     loading: weatherLoading,
     error,
     refresh,
@@ -169,19 +172,19 @@ export default function HomeScreen() {
         {weather && (
           <View style={styles.statsRow}>
             <StatCard
-              icon="??"
+              icon="humidity"
               value={`${weather.main.humidity}%`}
               label="Humidity"
               delay={0}
             />
             <StatCard
-              icon="??"
+              icon="wind"
               value={`${Math.round(weather.wind.speed * 3.6)}km/h`}
               label="Wind"
               delay={100}
             />
             <StatCard
-              icon="??"
+              icon="visibility"
               value={`${(weather.visibility / 1000).toFixed(1)}km`}
               label="Visibility"
               delay={200}
@@ -189,12 +192,15 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* Forecast placeholder */}
-        <View style={styles.forecastPlaceholder}>
-          <Text style={styles.forecastPlaceholderText}>
-            Hourly forecast coming in Chapter 4 ?
-          </Text>
-        </View>
+        {forecast && (
+          <>
+            <HourlyForecast
+              forecastList={forecast.list}
+              isNight={theme === "night"}
+            />
+            <DailyForecast forecastList={forecast.list} />
+          </>
+        )}
       </ScrollView>
     </LinearGradient>
   );
@@ -284,19 +290,5 @@ const styles = StyleSheet.create({
     color: "#ffaaaa",
     fontSize: 14,
     textAlign: "center",
-  },
-
-  // Forecast placeholder
-  forecastPlaceholder: {
-    backgroundColor: COLORS.whiteAlpha10,
-    borderRadius: SIZES.radius,
-    padding: 20,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: COLORS.whiteAlpha20,
-  },
-  forecastPlaceholderText: {
-    color: COLORS.whiteAlpha60,
-    fontSize: 14,
   },
 });
