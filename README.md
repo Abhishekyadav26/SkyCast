@@ -226,8 +226,8 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) for deta
 ### 👥 Support
 
 For questions, issues, or feature requests:
-- 📧 Create an [Issue](https://github.com/your-username/skycast/issues)
-- 💬 Start a [Discussion](https://github.com/your-username/skycast/discussions)
+- 📧 Create an [Issue](https://github.com/Abhishekyadav26/SkyCast/issues)
+- 💬 Start a [Discussion](https://github.com/Abhishekyadav26/SkyCast/discussions)
 - 📧 Email: support@skycast.app
 
 ---
